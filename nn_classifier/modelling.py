@@ -66,15 +66,15 @@ class FcnBinaryClassifier(nn.Module):
         # 4. Create a Linear layer object that projects from hidden_size to 1 and assign it to .output_layer
         # Our implementation is 6 lines of code (not counting the line breaks)
         # YOUR CODE STARTS
-        self.input_layer =
+        self.input_layer = nn.Linear(input_size, hidden_size)
 
         self.batch_norm = None
         if use_batch_norm:
-            self.batch_norm =
+            self.batch_norm = nn.BatchNorm1d(hidden_size)
 
-        self.dropout =
+        self.dropout = nn.Dropout(dropout_prob)
 
-        self.output_layer =
+        self.output_layer = nn.Linear(hidden_size, 1)
         # YOUR CODE ENDS
 
     def forward(self, x):
@@ -91,13 +91,15 @@ class FcnBinaryClassifier(nn.Module):
         # 3. Apply sigmoid to get probabilities after output_layer
         # YOUR CODE STARTS
         x = self.input_layer(x)
-        x =  # apply relu to x here
+        x = nn.ReLU()(x)  # apply relu to x here
 
         # apply batch norm here if the model has it
+        if self.batch_norm:
+            x = self.batch_norm(x)
 
         x = self.dropout(x)
         x = self.output_layer(x)
-        prob =  # convert x to probabilities
+        prob = nn.Sigmoid()(x) # convert x to probabilities
         # YOUR CODE ENDS
 
         return prob

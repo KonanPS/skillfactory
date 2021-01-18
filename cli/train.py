@@ -100,7 +100,8 @@ def main(args):
     # if cuda is not available, set device to "cpu"
     # Our implementation is 2 lines
     # YOUR CODE STARTS
-
+    if not device:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # YOUR CODE ENDS
 
     _device_description = "CPU" if device == "cpu" else "GPU"
@@ -142,7 +143,7 @@ def main(args):
     # and provide learning rate and weight decay parameters to it
     # Our implementation is 1 line
     # YOUR CODE STARTS
-
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=arg.weight_decay)
     # YOUR CODE ENDS
 
     # Initialize current best accuracy as 0 for early stopping
@@ -184,8 +185,8 @@ def main(args):
         # Use utils.evaluate_model to get it and wandb.log to log it as "test_acc"
         # Our implementation is 2 lines
         # YOUR CODE STARTS
-        acc =
-
+        acc = utils.evaluate_model(model, dataloader, device=device)
+        wandb.log({'test_acc': acc})
         # YOUR CODE ENDS
 
         # TASK 2.4 (3 points): if output_dir is provided and test accuracy is better than the current best accuracy
@@ -198,7 +199,16 @@ def main(args):
         # Before that use the logger.info to indicate that the training stopped early.
         # Our implementation is 12 lines
         # YOUR CODE STARTS
-
+        if acc > best_acc:
+            best_acc = acc
+            if args.output_dir:
+                torch.save(model.state_dict(), os.path.join(args.output_dir, 'model_checkpoint.pt'))
+            epochs_without_improvement = 0
+        else:
+            if epochs_without_improvement > args.early_stopping:
+                logger.info('Early stopping')
+                break
+            epochs_without_improvement += 1
         # YOUR CODE
 
     # Log the best accuracy as a summary so that wandb would use it instead of the final value
