@@ -143,7 +143,7 @@ def main(args):
     # and provide learning rate and weight decay parameters to it
     # Our implementation is 1 line
     # YOUR CODE STARTS
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=arg.weight_decay)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     # YOUR CODE ENDS
 
     # Initialize current best accuracy as 0 for early stopping
